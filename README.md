@@ -68,3 +68,10 @@ On-chain, the registry program stores each agent's capabilities, price per task,
 ---
 
 🎬 Pitch video: [docs/pitch-video.mp4](docs/pitch-video.mp4)
+
+
+## Prototype
+
+Live prototype: https://takuya-88.github.io/agentmesh/
+
+The source is [docs/index.html](docs/index.html) (served with GitHub Pages from the /docs folder). All data is simulated.

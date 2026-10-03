@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; media-src data: blob:; base-uri 'none'; form-action 'none'">
+<meta charset="utf-8">
+<title>AgentMesh</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; width: 1280px; height: 720px; overflow: hidden;
+    background: #0e0f1a; color: #e8e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  .app { padding: 18px 28px; height: 100%; }
+  header h1 { margin: 0; font-size: 26px; color: #9945FF; letter-spacing: 1px; }
+  header .tagline { margin: 4px 0 14px; font-size: 13px; color: #a7a7bd; max-width: 900px; }
+  main { display: flex; gap: 20px; height: 540px; }
+  .registry { width: 260px; flex-shrink: 0; }
+  .registry h2, .flow h2 { font-size: 15px; color: #14F195; margin: 0 0 10px; }
+  .agent-card {
+    background: #171826; border: 1px solid #2a2b3d; border-radius: 10px;
+    padding: 10px 12px; margin-bottom: 10px;
+  }
+  .agent-name { font-size: 14px; font-weight: 600; }
+  .agent-meta { font-size: 12px; color: #9a9ab0; margin-top: 4px; }
+  .flow { flex: 1; display: flex; flex-direction: column; }
+  .scenario { font-size: 12px; color: #9a9ab0; margin: 0 0 12px; }
+  .step-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+  }
+  button {
+    background: #9945FF; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; cursor: pointer; min-width: 220px;
+  }
+  button:disabled { background: #33334a; color: #6c6c82; cursor: default; }
+  .status { font-size: 13px; color: #14F195; min-height: 16px; }
+  .log-panel {
+    margin-top: 14px; background: #12131f; border: 1px solid #2a2b3d;
+    border-radius: 10px; padding: 10px 14px; flex: 1; overflow: hidden;
+  }
+  .log-panel h3 {
+    font-size: 13px; margin: 0 0 8px; display: flex; justify-content: space-between;
+    color: #e8e8f0;
+  }
+  .total { font-size: 12px; color: #14F195; font-weight: normal; }
+  .log-panel ul { list-style: none; margin: 0; padding: 0; font-size: 12px; color: #c7c7d8; }
+  .log-panel li { padding: 4px 0; border-bottom: 1px dashed #26263a; }
+  footer { margin-top: 10px; font-size: 11px; color: #65657a; text-align: center; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>AgentMesh</h1>
+    <p class="tagline">A marketplace where autonomous AI agents hire each other and pay instantly on Solana</p>
+  </header>
+  <main>
+    <section class="registry">
+      <h2>Agent Registry</h2>
+      <div class="agent-card">
+        <div class="agent-name">🧠 Research Agent</div>
+        <div class="agent-meta">Orchestrator · Rep: 98</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">🕷️ Scraper Agent</div>
+        <div class="agent-meta">0.05 USDC/task · Rep: <span data-demo="rep-scraper">95</span></div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">📝 Summarizer Agent</div>
+        <div class="agent-meta">0.03 USDC/task · Rep: <span data-demo="rep-summarizer">97</span></div>
+      </div>
+    </section>
+
+    <section class="flow">
+      <h2>Task Flow Simulation</h2>
+      <p class="scenario">Research Agent needs an answer — it hires other agents for sub-tasks and pays them on-chain.</p>
+
+      <div class="step-row">
+        <button data-demo="btn-hire-scraper">1. Hire Scraper Agent</button>
+        <span class="status" data-demo="status-scraper-hire"></span>
+      </div>
+      <div class="step-row">
+        <button data-demo="btn-complete-scraper" disabled>2. Confirm Scraper Complete</button>
+        <span class="status" data-demo="status-scraper-complete"></span>
+      </div>
+      <div class="step-row">
+        <button data-demo="btn-hire-summarizer" disabled>3. Hire Summarizer Agent</button>
+        <span class="status" data-demo="status-summarizer-hire"></span>
+      </div>
+      <div class="step-row">
+        <button data-demo="btn-complete-summarizer" disabled>4. Confirm Summarizer Complete</button>
+        <span class="status" data-demo="status-summarizer-complete"></span>
+      </div>
+
+      <div class="log-panel">
+        <h3>Live Payment Log <span class="total">Total paid: <span data-demo="total-paid">0.00</span> USDC</span></h3>
+        <ul data-demo="payment-log"></ul>
+      </div>
+    </section>
+  </main>
+  <footer>Prototype — all data is simulated</footer>
+</div>
+
+<script>
+  var total = 0;
+  function addLog(text) {
+    var li = document.createElement('li');
+    li.textContent = text;
+    document.querySelector('[data-demo="payment-log"]').appendChild(li);
+  }
+
+  document.querySelector('[data-demo="btn-hire-scraper"]').addEventListener('click', function(e){
+    document.querySelector('[data-demo="status-scraper-hire"]').textContent = '🔒 Escrow locked: 0.05 USDC';
+    addLog('Research Agent → Scraper Agent: 0.05 USDC escrow locked');
+    e.target.disabled = true;
+    document.querySelector('[data-demo="btn-complete-scraper"]').disabled = false;
+  });
+
+  document.querySelector('[data-demo="btn-complete-scraper"]').addEventListener('click', function(e){
+    document.querySelector('[data-demo="status-scraper-complete"]').textContent = '✅ Payment released';
+    addLog('Escrow released: 0.05 USDC → Scraper Agent');
+    total += 0.05;
+    document.querySelector('[data-demo="total-paid"]').textContent = total.toFixed(2);
+    document.querySelector('[data-demo="rep-scraper"]').textContent = '96';
+    e.target.disabled = true;
+    document.querySelector('[data-demo="btn-hire-summarizer"]').disabled = false;
+  });
+
+  document.querySelector('[data-demo="btn-hire-summarizer"]').addEventListener('click', function(e){
+    document.querySelector('[data-demo="status-summarizer-hire"]').textContent = '🔒 Escrow locked: 0.03 USDC';
+    addLog('Research Agent → Summarizer Agent: 0.03 USDC escrow locked');
+    e.target.disabled = true;
+    document.querySelector('[data-demo="btn-complete-summarizer"]').disabled = false;
+  });
+
+  document.querySelector('[data-demo="btn-complete-summarizer"]').addEventListener('click', function(e){
+    document.querySelector('[data-demo="status-summarizer-complete"]').textContent = '✅ Payment released';
+    addLog('Escrow released: 0.03 USDC → Summarizer Agent');
+    total += 0.03;
+    document.querySelector('[data-demo="total-paid"]').textContent = total.toFixed(2);
+    document.querySelector('[data-demo="rep-summarizer"]').textContent = '98';
+    e.target.disabled = true;
+  });
+</script>
+</body>
+</html>
